@@ -13,27 +13,24 @@ namespace JailTime2.Core
 
         public int CellId { get; set; }
 
-        public bool IsArrested { get; set; }
+        public int Duration { get; set; }
 
-        public int ArrestDuration { get; set; }
+        public Vector3SE Position { get; set; }
 
-        public Vector3SE LastPositionBeforeArrest { get; set; }
+        public DateTime Date { get; private set; }
 
-        public DateTime JailTime { get; private set; }
-
-        public Player(CSteamID steamId, int cellId, bool isArrested, int arrestDuration, Vector3SE lastPositionBeforeArrest, DateTime jailTime)
+        public Player(CSteamID steamId, int cellId, int duration, Vector3SE position, DateTime date)
         {
             SteamId = steamId;
             CellId = cellId;
-            IsArrested = isArrested;
-            ArrestDuration = arrestDuration;
-            LastPositionBeforeArrest = lastPositionBeforeArrest;
-            JailTime = jailTime;
+            Duration = duration;
+            Position = position;
+            Date = date;
         }
 
         public override string ToString()
         {
-            return $"SteamId: {SteamId}, Arrested: {(IsArrested ? "да" : "нет")}, ArrestDuration: {ArrestDuration}с.";
+            return $"SteamId: {SteamId}, ArrestDuration: {Duration}с.";
         }
     }
 }

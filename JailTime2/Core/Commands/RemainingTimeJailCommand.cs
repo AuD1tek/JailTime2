@@ -38,7 +38,7 @@ namespace JailTime2.Core.Commands
 
                 Player prisoner = JailTimePlugin.Instance.Prison.GetPlayerBySteamId(player.CSteamID); // получаем игрока
 
-                double result = prisoner.ArrestDuration - (DateTime.Now - prisoner.JailTime).TotalSeconds; // получение времени которое осталось сидеть игроку
+                double result = prisoner.Duration - (DateTime.Now - prisoner.Date).TotalSeconds; // получение времени которое осталось сидеть игроку
 
                 UnturnedChat.Say(player, $"{JailTimePlugin.Instance.Translate("jailtime.successful", result.ToString("0"))}", Color.yellow);
 
@@ -61,7 +61,7 @@ namespace JailTime2.Core.Commands
 
                 Player prisoner = JailTimePlugin.Instance.Prison.GetPlayerBySteamId(toPlayer.CSteamID); // получаем игрока
 
-                double result = prisoner.ArrestDuration - (DateTime.Now - prisoner.JailTime).TotalSeconds; // получение времени которое осталось сидеть игроку
+                double result = prisoner.Duration - (DateTime.Now - prisoner.Date).TotalSeconds; // получение времени которое осталось сидеть игроку
 
                 UnturnedChat.Say(player, $"{JailTimePlugin.Instance.Translate("jailtime.successful.to.player", toPlayer.CharacterName, result.ToString("0"))}", Color.yellow);
                 return;

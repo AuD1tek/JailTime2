@@ -82,7 +82,8 @@ namespace JailTime2.Core.Commands.Jail
                 // одеть наручники на игрока
                 JailTimePlugin.Instance.Prison.HandcuffToPlayer(toPlayer.CSteamID);
 
-                JailTimePlugin.Instance.Prison.ArrestPlayer(toPlayer.CSteamID, resultDuration);
+
+                JailTimePlugin.Instance.Prison.ArrestPlayer(toPlayer, resultDuration);
                 UnturnedChat.Say(player, $"{JailTimePlugin.Instance.Translate("jail.successful.arrested", toPlayer.CharacterName, resultDuration)}", Color.yellow);
                 UnturnedChat.Say(toPlayer, $"{JailTimePlugin.Instance.Translate("jail.player.arrested.message", player.CharacterName, resultDuration)}", Color.red);
             }

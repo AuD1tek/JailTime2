@@ -25,9 +25,14 @@ namespace JailTime2.Core
 
         }
 
-        public Vector3 GetVector3()
+
+        public static implicit operator Vector3(Vector3SE vector)
         {
-            return new Vector3(X, Y, Z);
+            return new Vector3(vector.X, vector.Y, vector.Z);
+        }
+        public static implicit operator Vector3SE(Vector3 vector)
+        {
+            return new Vector3SE(vector.x, vector.y, vector.z);
         }
     }
 }

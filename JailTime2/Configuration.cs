@@ -11,6 +11,8 @@ namespace JailTime2
 {
     public class Configuration : IRocketPluginConfiguration
     {
+        public string DatabasePath;
+        
         public bool IgnoreLastPlayerPosition; // если false то игрока будет спавнить там где он пропал перед тем как попал в тюрягу
 
         public string BanArrestedReasonOnReconnect; // причина бана
@@ -25,6 +27,8 @@ namespace JailTime2
 
         public void LoadDefaults()
         {
+            DatabasePath = @"%rocket%\Plugins\JailTime2\Database\Prisoners.xml";
+            
             IgnoreLastPlayerPosition = false;
 
             BanArrestedReasonOnReconnect = "Вы были забанены за отключение от сервера, во время отбывания срока!";

@@ -78,6 +78,7 @@
     <Compile Include="Core\Manager\Prison.cs" />
     <Compile Include="Core\Player.cs" />
     <Compile Include="Core\Vector3SE.cs" />
+    <Compile Include="Core\XMLDatabase.cs" />
     <Compile Include="JailTimePlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

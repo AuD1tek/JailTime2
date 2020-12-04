@@ -10,47 +10,40 @@ namespace JailTime2.Core.Manager
 {
     public class Prison
     {
-        private List<Player> prisoners = new List<Player>();
+        public XMLDatabase Database = new XMLDatabase();
+        
 
-        public bool ArrestPlayer(CSteamID player, int arrestDuration)
+        public bool ArrestPlayer(UnturnedPlayer player, int arrestDuration)
         {
-            UnturnedPlayer resultPlayer = UnturnedPlayer.FromCSteamID(player); // получаем игрока которого мы передали через стим айди
-
-            if (IsPlayerContains(player))
+            if (IsPlayerContains(player.CSteamID))
             {
                 return false;
             }
 
             int cellId = GetRandomCell(out Vector3SE position);
+            Database.AddPrisoner(new Player(player.CSteamID, cellId, arrestDuration, player.Position, DateTime.Now));
 
-            prisoners.Add(new Player(resultPlayer.CSteamID, cellId, true, arrestDuration, new Vector3SE(resultPlayer.Position.x, resultPlayer.Position.y, resultPlayer.Position.z), DateTime.Now));
-
-            resultPlayer.Player.teleportToLocation(GetRandomCellPosition().GetVector3(), resultPlayer.Rotation);
+            player.Player.teleportToLocation(GetRandomCellPosition(), player.Rotation);
             return true;
         }
-        public bool UnArrestPlayer(CSteamID player)
+        public bool UnArrestPlayer(UnturnedPlayer player)
         {
-            if (!IsPlayerContains(player))
+            if (!IsPlayerContains(player.CSteamID))
             {
                 return false;
             }
 
-            Player resultPlayer = GetPlayerBySteamId(player);
-
+            Player resultPlayer = GetPlayerBySteamId(player.CSteamID);
             bool ignoreLastPosition = JailTimePlugin.Instance.Configuration.Instance.IgnoreLastPlayerPosition;
 
-            Vector3SE lastPosition = resultPlayer.LastPositionBeforeArrest;
-            Vector3SE spawnPointPosition = JailTimePlugin.Instance.Configuration.Instance.SpawnPointAfterArrest;
-
-            UnturnedPlayer thisPlayer = UnturnedPlayer.FromCSteamID(player);
             
             if (ignoreLastPosition)
             {
-                thisPlayer.Player.teleportToLocation(spawnPointPosition.GetVector3(), thisPlayer.Rotation);
+                player.Player.teleportToLocation(JailTimePlugin.Instance.Configuration.Instance.SpawnPointAfterArrest, player.Rotation);
             }
             else
             {
-                thisPlayer.Player.teleportToLocation(lastPosition.GetVector3(), thisPlayer.Rotation);
+                player.Player.teleportToLocation(resultPlayer.Position, player.Rotation);
             }
 
             RemovePlayer(resultPlayer.SteamId);
@@ -69,29 +62,24 @@ namespace JailTime2.Core.Manager
 
         public Player GetPlayerBySteamId(CSteamID player)
         {
-            Player resultPlayer = prisoners.FirstOrDefault(p => p.SteamId == player);
-            return resultPlayer;
+            return Database.GetPrisoner(player);
         }
         public int GetRandomCell(out Vector3SE cellPosition)
         {
-            Random rand = new Random();
-
             int minCellCount = JailTimePlugin.Instance.Configuration.Instance.Cells.Min(c => c.Id);
             int cellsCount = JailTimePlugin.Instance.Configuration.Instance.Cells.Count;
 
-            int result = rand.Next(minCellCount, cellsCount);
+            int result = UnityEngine.Random.Range(minCellCount, cellsCount);
 
             cellPosition = GetCellPositionById(result);
             return result;
         }
         public Vector3SE GetRandomCellPosition()
         {
-            Random rand = new Random();
-
             int minCellCount = JailTimePlugin.Instance.Configuration.Instance.Cells.Min(c => c.Id);
             int maxCellCount = JailTimePlugin.Instance.Configuration.Instance.Cells.Max(c => c.Id);
 
-            int result = rand.Next(minCellCount, maxCellCount);
+            int result = UnityEngine.Random.Range(minCellCount, maxCellCount);
 
             return GetCellPositionById(result);
         }
@@ -100,25 +88,13 @@ namespace JailTime2.Core.Manager
             Cell cell = JailTimePlugin.Instance.Configuration.Instance.Cells.FirstOrDefault(c => c.Id == id);
             return cell.Position;
         }
-        public bool IsPlayerArrested(CSteamID player)
-        {
-            Player resultPlayer = prisoners.FirstOrDefault(p => p.SteamId == player);
-            if (resultPlayer.IsArrested)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
         public bool IsPlayerContains(CSteamID player)
         {
-            return prisoners.FirstOrDefault(p => p.SteamId == player) != null;
+            return Database.GetPrisoner(player) != null;
         }
-        public void RemovePlayer(CSteamID player)
+        public bool RemovePlayer(CSteamID player)
         {
-            prisoners.Where(p => p.SteamId == player).ToList().ForEach(p => prisoners.Remove(p));
+            return Database.RemovePrisoner(player);
         }
         public Cell GetCellById(int id)
         {
@@ -133,10 +109,6 @@ namespace JailTime2.Core.Manager
         {
             var cells = JailTimePlugin.Instance.Configuration.Instance.Cells.Where(c => c.Id == id);
             return cells;
-        }
-        public IEnumerable<Player> GetPrisoners()
-        {
-            return prisoners;
         }
         public void TakeOffHandcuffsFromPlayer(CSteamID player)
         {

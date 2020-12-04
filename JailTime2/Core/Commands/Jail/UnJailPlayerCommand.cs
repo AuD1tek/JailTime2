@@ -58,7 +58,7 @@ namespace JailTime2.Core.Commands.Jail
 
                 JailTimePlugin.Instance.Prison.TakeOffHandcuffsFromPlayer(toPlayer.CSteamID);
 
-                JailTimePlugin.Instance.Prison.UnArrestPlayer(toPlayer.CSteamID);
+                JailTimePlugin.Instance.Prison.UnArrestPlayer(toPlayer);
                 UnturnedChat.Say(player, $"{JailTimePlugin.Instance.Translate("unjail.successful.unnarrested", toPlayer.CharacterName)}", Color.yellow);
                 UnturnedChat.Say(toPlayer, $"{JailTimePlugin.Instance.Translate("unjail.successful.player.unnarrested", player.CharacterName)}", Color.green);
 

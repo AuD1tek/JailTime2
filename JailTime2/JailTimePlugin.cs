@@ -11,6 +11,7 @@ using Rocket.Unturned.Player;
 using SDG.Unturned;
 using Steamworks;
 using System;
+using System.Linq;
 using System.Net.Sockets;
 using UnityEngine;
 
@@ -131,7 +132,7 @@ namespace JailTime2
                 Core.Player prisoner = Prison.GetPlayerBySteamId(player.CSteamID);
                 Cell cell = Prison.GetCellById(prisoner.CellId);
 
-                player.Player.teleportToLocation(cell.Position.GetVector3(), player.Rotation);
+                player.Player.teleportToLocation(cell.Position, player.Rotation);
 
                 UnturnedChat.Say(player, $"{Translate("arrested.suicide")}", Color.red);
             }
@@ -151,19 +152,21 @@ namespace JailTime2
         #region FixedUpdate
         public void FixedUpdate()
         {
-            foreach (Core.Player prisoner in Instance.Prison.GetPrisoners())
+            foreach (UnturnedPlayer player in Provider.clients.Select(s => UnturnedPlayer.FromSteamPlayer(s)))
             {
-                UnturnedPlayer player = UnturnedPlayer.FromCSteamID(prisoner.SteamId);
-                if (Vector3.Distance(player.Position, Prison.GetCellPositionById(prisoner.CellId).GetVector3()) > Instance.Configuration.Instance.WalkDistance)
-                {
-                    player.Player.teleportToLocation(Prison.GetCellPositionById(prisoner.CellId).GetVector3(), player.Rotation);
-                } // Система возвращения игрока обратно если он ушел далеко от место тюрьмы
+                Core.Player prisoner = Prison.GetPlayerBySteamId(player.CSteamID);
 
-                if ((DateTime.Now - prisoner.JailTime).TotalSeconds >= prisoner.ArrestDuration)
+                if (prisoner != null)
                 {
-                    Instance.Prison.UnArrestPlayer(prisoner.SteamId);
-                    Instance.Prison.TakeOffHandcuffsFromPlayer(prisoner.SteamId);
-                } // Система освобождения игрока из тюрьмы!
+                    if (Vector3.Distance(player.Position, Prison.GetCellPositionById(prisoner.CellId)) > Instance.Configuration.Instance.WalkDistance)
+                        player.Player.teleportToLocation(Prison.GetCellPositionById(prisoner.CellId), player.Rotation);
+
+                    if ((DateTime.Now - prisoner.Date).TotalSeconds >= prisoner.Duration)
+                    {
+                        Prison.UnArrestPlayer(player);
+                        Prison.TakeOffHandcuffsFromPlayer(prisoner.SteamId);
+                    }
+                }
             }
         }
         #endregion
